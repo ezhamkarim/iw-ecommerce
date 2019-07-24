@@ -1,0 +1,100 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:rxdart/rxdart.dart';
+
+
+
+
+class AuthService{
+final FirebaseAuth _auth = FirebaseAuth.instance;
+final GoogleSignIn googleSignIn = GoogleSignIn();
+final Firestore _db = Firestore.instance;
+
+Observable<FirebaseUser> name;
+Observable<Map<String,dynamic>> email;
+String imageUrl;
+PublishSubject loading = PublishSubject();
+
+AuthService(){
+  name = Observable(_auth.onAuthStateChanged);
+  email = name.switchMap((FirebaseUser u){
+    if(u!=null){
+      return _db.collection('users').document(u.uid).snapshots().map((snap) => snap.data);
+
+    } else {
+      return Observable.just({});
+    }
+
+  });
+
+}
+Future<FirebaseUser> signInWithGoogle() async {
+  loading.add(true);
+  final GoogleSignInAccount googleSignInAccount = await googleSignIn.signIn();
+  final GoogleSignInAuthentication googleSignInAuthentication =
+      await googleSignInAccount.authentication;
+
+  final AuthCredential credential = GoogleAuthProvider.getCredential(
+    accessToken: googleSignInAuthentication.accessToken,
+    idToken: googleSignInAuthentication.idToken,
+  );
+
+  final FirebaseUser user = await _auth.signInWithCredential(credential);
+
+  updateUserData(user);
+  loading.add(false);
+  return user;
+ /*  assert(user.email != null);
+  assert(user.displayName != null);
+  assert(user.photoUrl != null);
+  assert(!user.isAnonymous);
+  assert(await user.getIdToken() != null);
+
+  name = user.displayName;
+  email = user.email;
+  imageUrl = user.photoUrl;
+
+  if (name.contains(" ")) {
+    name = name.substring(0, name.indexOf(" "));
+  }
+
+  final FirebaseUser currentUser = await _auth.currentUser();
+  assert(user.uid == currentUser.uid);
+
+  return 'signInWithGoogle succeeded: $user'; */
+}
+   void updateUserData(FirebaseUser user) async {
+    DocumentReference ref = _db.collection('users').document(user.uid);
+    
+    return ref.setData({
+      'uid': user.uid,
+      'email': user.email,
+      'photoURL': user.photoUrl,
+      'displayName': user.displayName,
+      'lastseen': DateTime.now(),
+    }, merge: true);
+  }
+
+  void getUserData(FirebaseUser user) async {
+    DocumentReference ref = _db.collection('users').document(user.uid);
+  }
+
+ /*  void getUserData(FirebaseUser user) async {
+    DocumentReference ref = _db.collection('users').document(user.uid);
+    
+    return ref.get({
+      user.displayName,
+      use
+
+    });
+  } */
+
+
+void signOutGoogle() async {
+  await googleSignIn.signOut();
+
+  print("User Sign Out");
+}
+}
+final AuthService authService = AuthService();
