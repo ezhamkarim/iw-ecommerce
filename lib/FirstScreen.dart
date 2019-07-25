@@ -2,47 +2,66 @@ import 'package:flutter/material.dart';
 import 'package:sign_in_flutter/login_page.dart';
 import 'package:sign_in_flutter/sign_in.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
+Future<FirebaseUser> currentUser = authService.getCurrentUser();
+String userUID;
 
 class FattahAmien extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    currentUser.then((value) {
+      userUID = value.uid;
+    });
+
     return StreamBuilder(
-      stream: authService.name,
-      builder: (context, snapshot) {
-        return Scaffold(
-          appBar: AppBar(
-            centerTitle: true,
-            backgroundColor: Colors.teal,
-            title: Text(
-              'Home Food',
-              style: TextStyle(
-                fontFamily: 'LiterataBook',
-                fontWeight: FontWeight.bold,
+        stream: authService.user,
+        builder: (context, snapshot) {
+          return Scaffold(
+            appBar: AppBar(
+              centerTitle: true,
+              backgroundColor: Colors.teal,
+              title: Text(
+                'Home Food',
+                style: TextStyle(
+                  fontFamily: 'LiterataBook',
+                  fontWeight: FontWeight.bold,
+                ),
               ),
+              actions: <Widget>[
+                IconButton(
+                  icon: Icon(Icons.shopping_basket),
+                  onPressed: () {},
+                ),
+                IconButton(
+                  icon: Icon(Icons.search),
+                  onPressed: () {},
+                ),
+              ],
             ),
-            actions: <Widget>[
-              IconButton(
-                icon: Icon(Icons.shopping_basket),
-                onPressed: () {},
-              ),
-              IconButton(
-                icon: Icon(Icons.search),
-                onPressed: () {},
-              ),
-            ],
-          ),
-          drawer: DrawerNav(),
-          body: ProductList(),
-        );
-      }
-    );
+            drawer: DrawerNav(),
+            body: ProductList(),
+          );
+        });
   }
 }
 
-class DrawerNav extends StatelessWidget {
+class DrawerNav extends StatefulWidget {
+  @override
+  _DrawerNavState createState() => _DrawerNavState();
+}
 
-  Firestore _db = Firestore.instance;
+class _DrawerNavState extends State<DrawerNav> {
+  Map<String, dynamic> profile;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    authService.profile.listen((state) => setState(() => profile = state));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -53,29 +72,29 @@ class DrawerNav extends StatelessWidget {
           children: <Widget>[
             Center(
               child: CircleAvatar(
-                  backgroundImage: NetworkImage(
+                backgroundImage: NetworkImage(
                     "http://pngimg.com/uploads/dog/dog_PNG50322.png"
                     //imageUrl,
+                    ),
+                radius: 60,
+                backgroundColor: Colors.transparent,
+              ),
+            ),
+            StreamBuilder(
+              stream: Firestore.instance
+                  .collection('users')
+                  .document(userUID)
+                  .snapshots(),
+              builder: (context, snapshot) {
+                return Text(
+                  snapshot.data['displayName'],
+                  style: TextStyle(
+                    fontSize: 18.0,
+                    fontFamily: 'LiterataBook',
                   ),
-                  radius: 60,
-                  backgroundColor: Colors.transparent,
-                ),
-            ),
-            Text(
-              authService.name.toString(),
-              style: TextStyle(
-                fontSize: 18.0,
-                fontFamily: 'LiterataBook',
-              ),
-              textAlign: TextAlign.center,
-            ),
-            Text(
-              authService.email.toString(),
-              style: TextStyle(
-                fontSize: 18.0,
-                fontFamily: 'LiterataBook',
-              ),
-              textAlign: TextAlign.center,
+                  textAlign: TextAlign.center,
+                );
+              },
             ),
             Divider(height: 48.0, color: Color.fromARGB(0, 0, 0, 0)),
             GestureDetector(
@@ -137,26 +156,35 @@ class DrawerNav extends StatelessWidget {
 
             Center(
               child: RaisedButton(
-                  onPressed: () {
-                    authService.signOutGoogle();
-                    Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) {return LoginPage();}), ModalRoute.withName('/'));
-                  },
-                  color: Colors.teal,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      'Sign Out',
-                      style: TextStyle( color: Colors.white),
-                    ),
+                onPressed: () {
+                  authService.signOutGoogle();
+                  Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (context) {
+                    return LoginPage();
+                  }), ModalRoute.withName('/'));
+                },
+                color: Colors.teal,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    'Sign Out',
+                    style: TextStyle(color: Colors.white),
                   ),
-                  elevation: 5,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(40)),
                 ),
+                elevation: 5,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(40)),
+              ),
             )
           ],
         ),
       ),
+    );
+  }
+
+  Widget getname() {
+    return Column(
+      children: <Widget>[Text(profile.toString())],
     );
   }
 }
@@ -164,8 +192,8 @@ class DrawerNav extends StatelessWidget {
 class ProductCard extends StatelessWidget {
   final String id, _image, _title, _seller, _price, _description;
 
-  ProductCard(
-      this.id, this._image, this._title, this._seller, this._price, this._description);
+  ProductCard(this.id, this._image, this._title, this._seller, this._price,
+      this._description);
 
   @override
   Widget build(BuildContext context) {
@@ -274,84 +302,3 @@ class ProductList extends StatelessWidget {
     );
   }
 }
-
-
-/* class FirstScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topRight,
-            end: Alignment.bottomLeft,
-            colors: [Colors.blue[100], Colors.blue[400]],
-          ),
-        ),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.max,
-            children: <Widget>[
-              CircleAvatar(
-                backgroundImage: NetworkImage(
-                  imageUrl,
-                ),
-                radius: 60,
-                backgroundColor: Colors.transparent,
-              ),
-              SizedBox(height: 40),
-              Text(
-                'NAME',
-                style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black54),
-              ),
-              Text(
-                name,
-                style: TextStyle(
-                    fontSize: 25,
-                    color: Colors.deepPurple,
-                    fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 20),
-              Text(
-                'EMAIL',
-                style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black54),
-              ),
-              Text(
-                email,
-                style: TextStyle(
-                    fontSize: 25,
-                    color: Colors.deepPurple,
-                    fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 40),
-              RaisedButton(
-                onPressed: () {
-                  signOutGoogle();
-                  Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) {return LoginPage();}), ModalRoute.withName('/'));
-                },
-                color: Colors.deepPurple,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    'Sign Out',
-                    style: TextStyle(fontSize: 25, color: Colors.white),
-                  ),
-                ),
-                elevation: 5,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(40)),
-              )
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-} */
