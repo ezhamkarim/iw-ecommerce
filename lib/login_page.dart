@@ -31,7 +31,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _signInButton() {
     return StreamBuilder(
-      stream: authService.name,
+      stream: authService.user,
       builder: (context, snapshot) {
         return OutlineButton(
           splashColor: Colors.grey,
