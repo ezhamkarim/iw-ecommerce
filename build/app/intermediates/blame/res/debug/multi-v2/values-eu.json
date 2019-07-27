@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "C:\\Users\\ezham\\sign_in_flutter\\build\\app\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-eu\\values-eu.xml",
+            "outputFile": "C:\\Users\\ezham\\iw-ecommerce\\build\\app\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-eu\\values-eu.xml",
             "map": [
                 {
                     "source": "C:\\Users\\ezham\\.gradle\\caches\\transforms-1\\files-1.1\\play-services-base-17.0.0.aar\\d845f025bb8cf0b0e0bb62ce7b369314\\res\\values-eu\\values.xml",
