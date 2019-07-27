@@ -12,13 +12,17 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        color: Colors.white,
+        color: Colors.teal,
         child: Center(
           child: Column(
             mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              FlutterLogo(size: 150),
+              Text('Get Started', style: TextStyle(
+                  fontFamily: 'LiterataBook',
+                  fontSize: 40,
+                  color: Colors.white
+                ),),
               SizedBox(height: 50),
               _signInButton(
               ),
@@ -34,7 +38,8 @@ class _LoginPageState extends State<LoginPage> {
       stream: authService.user,
       builder: (context, snapshot) {
         return OutlineButton(
-          splashColor: Colors.grey,
+          splashColor: Colors.white,
+          
           onPressed: () {
             
              authService.signInWithGoogle().whenComplete(() {
@@ -49,7 +54,7 @@ class _LoginPageState extends State<LoginPage> {
           },
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
           highlightElevation: 0,
-          borderSide: BorderSide(color: Colors.grey),
+          borderSide: BorderSide(color: Colors.white),
           child: Padding(
             padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
             child: Row(
@@ -63,7 +68,7 @@ class _LoginPageState extends State<LoginPage> {
                     'Sign in with Google',
                     style: TextStyle(
                       fontSize: 20,
-                      color: Colors.grey,
+                      color: Colors.white,
                     ),
                   ),
                 )

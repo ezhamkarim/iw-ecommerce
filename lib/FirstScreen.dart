@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:sign_in_flutter/cartview.dart';
 import 'package:sign_in_flutter/login_page.dart';
+import 'package:sign_in_flutter/sellerprofile.dart';
 import 'package:sign_in_flutter/sign_in.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -32,7 +34,14 @@ class FattahAmien extends StatelessWidget {
               actions: <Widget>[
                 IconButton(
                   icon: Icon(Icons.shopping_basket),
-                  onPressed: () {},
+                  onPressed: () {
+
+                    Navigator.push(
+                      context, MaterialPageRoute(
+                        builder: (context) => MyCart()
+                      )
+                    );
+                  },
                 ),
                 IconButton(
                   icon: Icon(Icons.search),
@@ -53,15 +62,6 @@ class DrawerNav extends StatefulWidget {
 }
 
 class _DrawerNavState extends State<DrawerNav> {
-  Map<String, dynamic> profile;
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    authService.profile.listen((state) => setState(() => profile = state));
-  }
-
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -73,14 +73,15 @@ class _DrawerNavState extends State<DrawerNav> {
             Center(
               child: CircleAvatar(
                 backgroundImage: NetworkImage(
-                    "http://pngimg.com/uploads/dog/dog_PNG50322.png"
-                    //imageUrl,
+                    //"http://pngimg.com/uploads/dog/dog_PNG50322.png"
+                    imageUrl,
                     ),
                 radius: 60,
                 backgroundColor: Colors.transparent,
               ),
             ),
-            StreamBuilder(
+            Divider(height: 48.0, color: Color.fromARGB(0, 0, 0, 0)),
+            /* StreamBuilder(
               stream: Firestore.instance
                   .collection('users')
                   .document(userUID)
@@ -95,11 +96,29 @@ class _DrawerNavState extends State<DrawerNav> {
                   textAlign: TextAlign.center,
                 );
               },
+            ),  */
+            Text(
+              userName,
+              style: TextStyle(
+                fontSize: 18.0,
+                fontFamily: 'LiterataBook',
+              ),
+              textAlign: TextAlign.center,
+            ),
+            Divider(height: 48.0, color: Color.fromARGB(0, 0, 0, 0)),
+            Text(
+              userID,
+              style: TextStyle(
+                fontSize: 18.0,
+                fontFamily: 'LiterataBook',
+              ),
+              textAlign: TextAlign.center,
             ),
             Divider(height: 48.0, color: Color.fromARGB(0, 0, 0, 0)),
             GestureDetector(
               onTap: () {
                 print('Open profile');
+                Navigator.push(context, MaterialPageRoute(builder: (context)=> MySellerProfile()));
               }, // TODO: Implement navigation to profile page
               child: Text(
                 'Profile',
@@ -153,11 +172,11 @@ class _DrawerNavState extends State<DrawerNav> {
               ),
             ),
             SizedBox(height: 40),
-
             Center(
               child: RaisedButton(
                 onPressed: () {
                   authService.signOutGoogle();
+
                   Navigator.of(context).pushAndRemoveUntil(
                       MaterialPageRoute(builder: (context) {
                     return LoginPage();
@@ -179,12 +198,6 @@ class _DrawerNavState extends State<DrawerNav> {
           ],
         ),
       ),
-    );
-  }
-
-  Widget getname() {
-    return Column(
-      children: <Widget>[Text(profile.toString())],
     );
   }
 }
