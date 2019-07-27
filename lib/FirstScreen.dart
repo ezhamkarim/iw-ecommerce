@@ -34,6 +34,7 @@ class FattahAmien extends StatelessWidget {
               actions: <Widget>[
                 IconButton(
                   icon: Icon(Icons.shopping_basket),
+<<<<<<< HEAD
                   onPressed: () {
 
                     Navigator.push(
@@ -42,6 +43,9 @@ class FattahAmien extends StatelessWidget {
                       )
                     );
                   },
+=======
+                  onPressed: () {},
+>>>>>>> 970bf061089436db7914a8b380aaa516095ebf61
                 ),
                 IconButton(
                   icon: Icon(Icons.search),
@@ -60,8 +64,22 @@ class DrawerNav extends StatefulWidget {
   @override
   _DrawerNavState createState() => _DrawerNavState();
 }
+<<<<<<< HEAD
 
 class _DrawerNavState extends State<DrawerNav> {
+=======
+
+class _DrawerNavState extends State<DrawerNav> {
+  Map<String, dynamic> profile;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    authService.profile.listen((state) => setState(() => profile = state));
+  }
+
+>>>>>>> 970bf061089436db7914a8b380aaa516095ebf61
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -73,6 +91,7 @@ class _DrawerNavState extends State<DrawerNav> {
             Center(
               child: CircleAvatar(
                 backgroundImage: NetworkImage(
+<<<<<<< HEAD
                     //"http://pngimg.com/uploads/dog/dog_PNG50322.png"
                     imageUrl,
                     ),
@@ -102,9 +121,16 @@ class _DrawerNavState extends State<DrawerNav> {
               style: TextStyle(
                 fontSize: 18.0,
                 fontFamily: 'LiterataBook',
+=======
+                    "http://pngimg.com/uploads/dog/dog_PNG50322.png"
+                    //imageUrl,
+                    ),
+                radius: 60,
+                backgroundColor: Colors.transparent,
+>>>>>>> 970bf061089436db7914a8b380aaa516095ebf61
               ),
-              textAlign: TextAlign.center,
             ),
+<<<<<<< HEAD
             Divider(height: 48.0, color: Color.fromARGB(0, 0, 0, 0)),
             Text(
               userID,
@@ -113,6 +139,23 @@ class _DrawerNavState extends State<DrawerNav> {
                 fontFamily: 'LiterataBook',
               ),
               textAlign: TextAlign.center,
+=======
+            StreamBuilder(
+              stream: Firestore.instance
+                  .collection('users')
+                  .document(userUID)
+                  .snapshots(),
+              builder: (context, snapshot) {
+                return Text(
+                  snapshot.data['displayName'],
+                  style: TextStyle(
+                    fontSize: 18.0,
+                    fontFamily: 'LiterataBook',
+                  ),
+                  textAlign: TextAlign.center,
+                );
+              },
+>>>>>>> 970bf061089436db7914a8b380aaa516095ebf61
             ),
             Divider(height: 48.0, color: Color.fromARGB(0, 0, 0, 0)),
             GestureDetector(
@@ -176,7 +219,10 @@ class _DrawerNavState extends State<DrawerNav> {
               child: RaisedButton(
                 onPressed: () {
                   authService.signOutGoogle();
+<<<<<<< HEAD
 
+=======
+>>>>>>> 970bf061089436db7914a8b380aaa516095ebf61
                   Navigator.of(context).pushAndRemoveUntil(
                       MaterialPageRoute(builder: (context) {
                     return LoginPage();
@@ -198,6 +244,12 @@ class _DrawerNavState extends State<DrawerNav> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget getname() {
+    return Column(
+      children: <Widget>[Text(profile.toString())],
     );
   }
 }
