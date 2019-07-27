@@ -138,7 +138,7 @@ class _MyItemAddState extends State<MyItemAdd> {
   }
 }
 
-class Dialogs {
+class Dialogs{
   information(BuildContext context, String title) {
     return showDialog(
         context: context,
