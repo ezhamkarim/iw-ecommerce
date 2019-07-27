@@ -4,6 +4,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:sign_in_flutter/FirstScreen.dart';
 
+
+String userName;
+String imageUrl;
+String userID;
+
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn googleSignIn = GoogleSignIn();
@@ -12,6 +17,7 @@ class AuthService {
   Observable<FirebaseUser> user;
   Observable<Map<String, dynamic>> profile;
   PublishSubject loading = PublishSubject();
+  
 
   AuthService() {
     user = Observable(_auth.onAuthStateChanged);
@@ -47,6 +53,17 @@ class AuthService {
 
     final FirebaseUser user = await _auth.signInWithCredential(credential);
 
+    
+    
+    userName = user.displayName;
+    imageUrl = user.photoUrl;
+    userID = user.uid;
+
+    if (userName.contains(" ")) {
+    userName = userName.substring(0, userName.indexOf(" "));
+  }
+
+ 
     updateUserData(user);
     loading.add(false);
 
@@ -59,7 +76,7 @@ class AuthService {
 
   name = user.displayName;
   email = user.email;
-  imageUrl = user.photoUrl;
+  
 
   if (name.contains(" ")) {
     name = name.substring(0, name.indexOf(" "));
@@ -82,18 +99,9 @@ class AuthService {
       'lastseen': DateTime.now(),
     }, merge: true);
   }
-
-  /* void getUserData(FirebaseUser user) async {
-    DocumentReference ref = Firestore.instance.collection('users').document(user.uid);
-
-    ref.get().whenComplete(whenCompleteListner)
-
-   
-  }  */
-
   void signOutGoogle() async {
     await googleSignIn.signOut();
-    userUID = null;
+    
     print("User Sign Out");
   }
 }
