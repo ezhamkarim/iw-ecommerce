@@ -78,7 +78,7 @@ class Dialogs {
                 ),
               ),
               FlatButton(
-                onPressed: () => Navigator.push(context,
+                onPressed: () => Navigator.pop(context,
                     MaterialPageRoute(builder: (context) => MyListings())),
                 child: Text(
                   'OK',

@@ -10,10 +10,12 @@ class MySellerProfile extends StatelessWidget {
     return Scaffold(
       // making AppBar with green color and Home Food Text
       appBar: AppBar(
+        centerTitle: true,
         title: Container(
           // To align the text to the center of the appbar
           padding: const EdgeInsets.only(left: 50.0),
           child: Text(
+            
             // Text with Home Food and white colored font
             'Home Food',
             style: TextStyle(color: Colors.white, fontFamily: 'LiterataBook'),
