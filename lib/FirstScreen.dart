@@ -103,9 +103,10 @@ class _DrawerNavState extends State<DrawerNav> {
                 fontSize: 18.0,
                 fontFamily: 'LiterataBook',
               ),
+              textAlign: TextAlign.center,
             ),
             Divider(height: 48.0, color: Color.fromARGB(0, 0, 0, 0)),
-            Text(
+            /* Text(
               userID,
               style: TextStyle(
                 fontSize: 18.0,
@@ -113,7 +114,7 @@ class _DrawerNavState extends State<DrawerNav> {
               ),
               textAlign: TextAlign.center,
             ),
-            Divider(height: 48.0, color: Color.fromARGB(0, 0, 0, 0)),
+            Divider(height: 48.0, color: Color.fromARGB(0, 0, 0, 0)), */
             GestureDetector(
               onTap: () {
                 print('Open profile');
