@@ -13,19 +13,17 @@ class _MyItemAddState extends State<MyItemAdd> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-         centerTitle: true,
-        title: Container(
-          // To align the text to the center of the appbar
-          
-          child: Text(
-            
-            // Text with Home Food and white colored font
-            'Home Food',
-            style: TextStyle(color: Colors.white, fontFamily: 'LiterataBook'),
+          centerTitle: true,
+          title: Container(
+            // To align the text to the center of the appbar
+
+            child: Text(
+              // Text with Home Food and white colored font
+              'Home Food',
+              style: TextStyle(color: Colors.white, fontFamily: 'LiterataBook'),
+            ),
           ),
-        ),
-        backgroundColor: Colors.teal
-      ),
+          backgroundColor: Colors.teal),
       body: ListView(
         children: <Widget>[
           Column(
@@ -39,74 +37,55 @@ class _MyItemAddState extends State<MyItemAdd> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Text('Name'),
                     Container(
-                      padding: const EdgeInsets.all(5.0),
-                      margin: const EdgeInsets.all(5.0),
-                      height: 50.0,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(10.0),
-                        ),
-                        border: Border.all(
-                          width: 1.0,
-                          color: Colors.black26,
-                        ),
-                      ),
-                    ),
-                    Text('Description'),
+                        padding: const EdgeInsets.all(12.0),
+                        child: TextFormField(
+                            //TODO implemention to get the data from the text field
+                            decoration: InputDecoration(
+                                labelText: 'Product Name',
+                                border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(6.0),
+                                    borderSide: BorderSide())))),
                     Container(
-                      padding: const EdgeInsets.all(5.0),
-                      margin: const EdgeInsets.all(5.0),
-                      height: 100.0,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(5.0),
-                        ),
-                        border: Border.all(
-                          width: 1.0,
-                          color: Colors.black26,
-                        ),
-                      ),
-                    ),
-                    Text('Price'),
+                        padding: const EdgeInsets.all(12.0),
+                        child: TextFormField(
+                            minLines: 4,
+                            maxLines: 4,
+                            textAlign: TextAlign
+                                .start, //TODO implemention to get the data from the text field
+                            decoration: InputDecoration(
+                                labelText: 'Description',
+                                border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(6.0),
+                                    borderSide: BorderSide())))),
                     Container(
-                      padding: const EdgeInsets.all(5.0),
-                      margin: const EdgeInsets.all(5.0),
-                      height: 50.0,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(5.0),
+                        padding: const EdgeInsets.all(12.0),
+                        child: TextFormField(
+                            //TODO implemention to get the data from the text field
+                            decoration: InputDecoration(
+                                labelText: 'Price',
+                                border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(6.0),
+                                    borderSide: BorderSide())))),
+                    GestureDetector(
+                      onTap: () {}, // TODO input image function & replace image
+                      child: Container(
+                        margin: EdgeInsets.all(15.0),
+                        padding: const EdgeInsets.all(12.0),
+                        decoration: BoxDecoration(
+                          border: Border.all(width: 1.0, color: Colors.grey),
+                          borderRadius: BorderRadius.circular(12.0),
                         ),
-                        border: Border.all(
-                          width: 1.0,
-                          color: Colors.black26,
-                        ),
-                      ),
-                    ),
-                    Text('Photos'),
-                    Container(
-                      padding: const EdgeInsets.all(5.0),
-                      margin: const EdgeInsets.all(5.0),
-                      height: 150.0,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(5.0),
-                        ),
-                        border: Border.all(
-                          width: 1.0,
-                          color: Colors.black26,
-                        ),
-                      ),
-                      child: GestureDetector(
-                        onTap: () {},
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            Icon(Icons.arrow_upward),
-                            Text('Upload Photo'),
-                          ],
+                        child: Padding(
+                          padding:
+                              const EdgeInsets.only(top: 50.0, bottom: 50.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Icon(Icons.file_upload),
+                              Text("Upload photo"),
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -140,7 +119,7 @@ class _MyItemAddState extends State<MyItemAdd> {
   }
 }
 
-class Dialogs{
+class Dialogs {
   information(BuildContext context, String title) {
     return showDialog(
         context: context,

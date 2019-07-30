@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:sign_in_flutter/orderverification.dart';
 
 
 class MyCheckout extends StatelessWidget {
@@ -112,7 +113,9 @@ class MyCheckout extends StatelessWidget {
                       RaisedButton(
                         padding: const EdgeInsets.all(8.0),
                         onPressed: () {
-                          
+                          Navigator.push(context, MaterialPageRoute(
+                            builder: (context)=> MyOrderVerification()
+                          ));
                         },
                         color: Colors.teal,
                         textColor: Colors.white,
