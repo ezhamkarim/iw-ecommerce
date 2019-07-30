@@ -4,6 +4,7 @@ import 'package:sign_in_flutter/login_page.dart';
 import 'package:sign_in_flutter/sellerprofile.dart';
 import 'package:sign_in_flutter/sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 Future<FirebaseUser> currentUser = authService.getCurrentUser();
 String userUID;
@@ -33,12 +34,8 @@ class FattahAmien extends StatelessWidget {
                 IconButton(
                   icon: Icon(Icons.shopping_basket),
                   onPressed: () {
-
-                    Navigator.push(
-                      context, MaterialPageRoute(
-                        builder: (context) => MyCart()
-                      )
-                    );
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => MyCart()));
                   },
                 ),
                 IconButton(
@@ -71,9 +68,9 @@ class _DrawerNavState extends State<DrawerNav> {
             Center(
               child: CircleAvatar(
                 backgroundImage: NetworkImage(
-                    //"http://pngimg.com/uploads/dog/dog_PNG50322.png"
-                    imageUrl,
-                    ),
+                  //"http://pngimg.com/uploads/dog/dog_PNG50322.png"
+                  imageUrl,
+                ),
                 radius: 60,
                 backgroundColor: Colors.transparent,
               ),
@@ -116,7 +113,8 @@ class _DrawerNavState extends State<DrawerNav> {
             GestureDetector(
               onTap: () {
                 print('Open profile');
-                Navigator.push(context, MaterialPageRoute(builder: (context)=> MySellerProfile()));
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => MySellerProfile()));
               }, // TODO: Implement navigation to profile page
               child: Text(
                 'Profile',
@@ -197,8 +195,6 @@ class _DrawerNavState extends State<DrawerNav> {
       ),
     );
   }
-
-
 }
 
 class ProductCard extends StatelessWidget {

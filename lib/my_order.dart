@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:sign_in_flutter/orderverification.dart';
 
 class MyOrdersPage extends StatefulWidget {
   @override
@@ -104,7 +105,7 @@ class _MyOrdersPageState extends State<MyOrdersPage> {
                   ),
                   margin: EdgeInsets.all(15.0),
                   height: 100.0,
-                  width: 325,
+                  
                   child: Container(
                     padding: EdgeInsets.all(10.0),
                     child: ListTile(
@@ -140,7 +141,11 @@ class _MyOrdersPageState extends State<MyOrdersPage> {
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: <Widget>[
                           InkWell(
-                            onTap: () {},
+                            onTap: () {
+                              Navigator.push(context, MaterialPageRoute(
+                            builder: (context)=> MyOrderVerification()
+                          ));
+                            },
                             child: Icon(
                               Icons.arrow_forward,
                               color: Colors.white30,
@@ -161,32 +166,39 @@ class _MyOrdersPageState extends State<MyOrdersPage> {
                     borderRadius: new BorderRadius.all(Radius.circular(10.0)),
                   ),
                   margin: EdgeInsets.all(15.0),
-                  height: 70.0,
-                  width: 325,
+                  height: 100.0,
+                  
                   child: Container(
                     padding: EdgeInsets.all(10.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          'Amien Yoo',
-                          style: TextStyle(
-                            color: Colors.white,
+                    child: ListTile(
+                      title: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            'Cawkurk Ey Chah Bochawh',
+                            style: TextStyle(
+                              color: Colors.white,
+                            ),
                           ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              OrderLists(
-                                prod_name: 'Nasi Kerja Hari Isnin',
-                                prod_quantity: '2',
-                              )
-                            ],
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                OrderLists(
+                                  prod_name: 'Nasi Daging Manusia',
+                                  prod_quantity: '4',
+                                ),
+                                OrderLists(
+                                  prod_name: 'Nasi Kerabu Depan',
+                                  prod_quantity: '1',
+                                )
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
+                      
                     ),
                   ),
                 ),

@@ -1,5 +1,9 @@
-import 'my_listings.dart';
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:sign_in_flutter/my_listings.dart';
+import 'crud.dart';
+import 'sign_in.dart';
 
 class MyItemAdd extends StatefulWidget {
   @override
@@ -7,8 +11,23 @@ class MyItemAdd extends StatefulWidget {
 }
 
 class _MyItemAddState extends State<MyItemAdd> {
-  Dialogs dialogs = new Dialogs();
+  
   String name;
+
+  CrudMethods crudObj = CrudMethods();
+
+  final textInputName = TextEditingController();
+  final textInputPrice = TextEditingController();
+  final textInputDescription = TextEditingController();
+
+  @override
+  void dispose() {
+    textInputName.dispose();
+    textInputPrice.dispose();
+    textInputDescription.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,19 +57,26 @@ class _MyItemAddState extends State<MyItemAdd> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Container(
-                        padding: const EdgeInsets.all(12.0),
-                        child: TextFormField(
-                            //TODO implemention to get the data from the text field
-                            decoration: InputDecoration(
-                                labelText: 'Product Name',
-                                border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(6.0),
-                                    borderSide: BorderSide())))),
+                      padding: const EdgeInsets.all(12.0),
+                      child: TextFormField(
+                        controller: textInputName,
+                        //TODO implemention to get the data from the text field
+                        decoration: InputDecoration(
+                          labelText: 'Product Name',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(6.0),
+                            borderSide: BorderSide(),
+                          ),
+                        ),
+                      ),
+                    ),
                     Container(
                         padding: const EdgeInsets.all(12.0),
                         child: TextFormField(
+                            
                             minLines: 4,
                             maxLines: 4,
+                            controller: textInputDescription,
                             textAlign: TextAlign
                                 .start, //TODO implemention to get the data from the text field
                             decoration: InputDecoration(
@@ -61,6 +87,8 @@ class _MyItemAddState extends State<MyItemAdd> {
                     Container(
                         padding: const EdgeInsets.all(12.0),
                         child: TextFormField(
+                            controller: textInputPrice,
+                            keyboardType: TextInputType.number,
                             //TODO implemention to get the data from the text field
                             decoration: InputDecoration(
                                 labelText: 'Price',
@@ -99,7 +127,22 @@ class _MyItemAddState extends State<MyItemAdd> {
                       ),
                       child: RaisedButton(
                         onPressed: () {
-                          dialogs.information(context, 'Item updated.');
+                            double price = double.parse(textInputPrice.text);
+
+                          Map<String, dynamic> productData = {
+                            'name': textInputName.text,
+                            'description': textInputDescription.text,
+                            'price': price,
+                            'sellerId' : userID,
+                          };
+
+                          crudObj.addData('product',productData).then((result){
+                            dialogTrigger(context, textInputName.text);
+                          });
+                          /* Firestore.instance.collection('product').add(map).catchError(() {
+                            print('Fattah Amien kacak <3');
+                          }); */
+                          
                         },
                         color: Colors.blue,
                         child: Text(
@@ -119,30 +162,31 @@ class _MyItemAddState extends State<MyItemAdd> {
   }
 }
 
-class Dialogs {
-  information(BuildContext context, String title) {
+Future <bool> dialogTrigger(BuildContext context, String title) async {
+  /* information(BuildContext context, String title) */ {
     return showDialog(
-        context: context,
-        barrierDismissible: true,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            backgroundColor: Color(0xff009688),
-            title: Text(
-              title,
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white),
-            ),
-            actions: <Widget>[
-              FlatButton(
-                onPressed: () => Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => MyListings())),
-                child: Text(
-                  'OK',
-                  style: TextStyle(color: Colors.white),
-                ),
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Color(0xff009688),
+          title: Text(
+            title,
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.white),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              onPressed: () { Navigator.pop(context);
+              Navigator.pop(context);},
+              child: Text(
+                'OK',
+                style: TextStyle(color: Colors.white),
               ),
-            ],
-          );
-        });
+            ),
+          ],
+        );
+      },
+    );
   }
 }
