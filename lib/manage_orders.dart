@@ -14,9 +14,7 @@ class _MyManageOrdersState extends State<MyManageOrders> {
          centerTitle: true,
         title: Container(
           // To align the text to the center of the appbar
-          
           child: Text(
-            
             // Text with Home Food and white colored font
             'Home Food',
             style: TextStyle(color: Colors.white, fontFamily: 'LiterataBook'),
