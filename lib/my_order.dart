@@ -13,17 +13,17 @@ class _MyOrdersPageState extends State<MyOrdersPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Container(
-          // To align the text to the center of the appbar
-          padding: const EdgeInsets.only(left: 50.0),
-          child: Text(
-            // Text with Home Food and white colored font
-            'Home Food',
-            style: TextStyle(color: Colors.white, fontFamily: 'LiterataBook'),
+          centerTitle: true,
+          title: Container(
+            // To align the text to the center of the appbar
+
+            child: Text(
+              // Text with Home Food and white colored font
+              'Home Food',
+              style: TextStyle(color: Colors.white, fontFamily: 'LiterataBook'),
+            ),
           ),
-        ),
-        backgroundColor: Color(0xff4CB5AB),
-      ),
+          backgroundColor: Colors.teal),
       body: ListView(
         children: <Widget>[
           Padding(

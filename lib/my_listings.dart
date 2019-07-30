@@ -13,16 +13,18 @@ class _MyListingsState extends State<MyListings> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+         centerTitle: true,
         title: Container(
           // To align the text to the center of the appbar
-          padding: const EdgeInsets.only(left: 50.0),
+          
           child: Text(
+            
             // Text with Home Food and white colored font
             'Home Food',
             style: TextStyle(color: Colors.white, fontFamily: 'LiterataBook'),
           ),
         ),
-        backgroundColor: Color(0xff4CB5AB),
+        backgroundColor: Colors.teal
       ),
       body: ListView(
         children: <Widget>[
