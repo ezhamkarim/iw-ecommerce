@@ -1,8 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:sign_in_flutter/my_listings.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:image_picker/image_picker.dart';
 import 'crud.dart';
+import 'dart:io';
+import 'package:path/path.dart';
 import 'sign_in.dart';
 
 class MyItemAdd extends StatefulWidget {
@@ -11,11 +14,34 @@ class MyItemAdd extends StatefulWidget {
 }
 
 class _MyItemAddState extends State<MyItemAdd> {
-  
+  File _image;
   String name;
+  String photoUrl;
+
+  Future getImage() async {
+    var image = await ImagePicker.pickImage(source: ImageSource.gallery);
+
+    setState(() {
+      _image = image;
+      print('Image Path $image');
+    });
+  }
+
+  Future uploadPic(BuildContext context) async {
+    String fileName = basename(_image.path);
+    StorageReference firebaseStorageRef =
+        FirebaseStorage.instance.ref().child(fileName);
+    StorageUploadTask uploadTask = firebaseStorageRef.putFile(_image);
+    StorageTaskSnapshot taskSnapshot = await uploadTask.onComplete;
+
+    final ref = FirebaseStorage.instance.ref().child(fileName);
+
+    photoUrl = await ref.getDownloadURL();
+    print('HIIIII NOTICE ME' + photoUrl);
+  }
 
   CrudMethods crudObj = CrudMethods();
-
+  // final String url;
   final textInputName = TextEditingController();
   final textInputPrice = TextEditingController();
   final textInputDescription = TextEditingController();
@@ -73,7 +99,6 @@ class _MyItemAddState extends State<MyItemAdd> {
                     Container(
                         padding: const EdgeInsets.all(12.0),
                         child: TextFormField(
-                            
                             minLines: 4,
                             maxLines: 4,
                             controller: textInputDescription,
@@ -96,7 +121,10 @@ class _MyItemAddState extends State<MyItemAdd> {
                                     borderRadius: BorderRadius.circular(6.0),
                                     borderSide: BorderSide())))),
                     GestureDetector(
-                      onTap: () {}, // TODO input image function & replace image
+                      onTap: () {
+                        print('Container Tapped');
+                        getImage();
+                      }, // TODO input image function & replace image
                       child: Container(
                         margin: EdgeInsets.all(15.0),
                         padding: const EdgeInsets.all(12.0),
@@ -107,14 +135,35 @@ class _MyItemAddState extends State<MyItemAdd> {
                         child: Padding(
                           padding:
                               const EdgeInsets.only(top: 50.0, bottom: 50.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              Icon(Icons.file_upload),
-                              Text("Upload photo"),
-                            ],
+                          child: (_image != null)
+                              ? Image.file(_image, fit: BoxFit.fill)
+                              : Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    Icon(Icons.file_upload),
+                                    Text("Upload photo"),
+                                  ],
+                                ),
+                        ),
+                      ),
+                    ),
+                    Center(
+                      child: RaisedButton(
+                        onPressed: () {
+                          uploadPic(context);
+                          confirmImageDialog(context);
+                        },
+                        color: Colors.teal,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            'Confirm Image',
+                            style: TextStyle(color: Colors.white),
                           ),
                         ),
+                        elevation: 5,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(40)),
                       ),
                     ),
                     Container(
@@ -127,22 +176,25 @@ class _MyItemAddState extends State<MyItemAdd> {
                       ),
                       child: RaisedButton(
                         onPressed: () {
-                            double price = double.parse(textInputPrice.text);
+                          double price = double.parse(textInputPrice.text);
 
                           Map<String, dynamic> productData = {
                             'name': textInputName.text,
                             'description': textInputDescription.text,
                             'price': price,
-                            'sellerId' : userID,
+                            'sellerId': userID,
+                            'sellerName': userName,
+                            'photoUrl': photoUrl
                           };
 
-                          crudObj.addData('product',productData).then((result){
+                          crudObj
+                              .addData('product', productData)
+                              .then((result) {
                             dialogTrigger(context, textInputName.text);
                           });
                           /* Firestore.instance.collection('product').add(map).catchError(() {
                             print('Fattah Amien kacak <3');
                           }); */
-                          
                         },
                         color: Colors.blue,
                         child: Text(
@@ -162,7 +214,35 @@ class _MyItemAddState extends State<MyItemAdd> {
   }
 }
 
-Future <bool> dialogTrigger(BuildContext context, String title) async {
+Future<bool> confirmImageDialog(BuildContext context) async {
+  return showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        backgroundColor: Color(0xff009688),
+        title: Text(
+          'Image is Added !',
+          textAlign: TextAlign.center,
+          style: TextStyle(color: Colors.white),
+        ),
+        actions: <Widget>[
+          FlatButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: Text(
+              'OK',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+Future<bool> dialogTrigger(BuildContext context, String title) async {
   /* information(BuildContext context, String title) */ {
     return showDialog(
       context: context,
@@ -171,14 +251,16 @@ Future <bool> dialogTrigger(BuildContext context, String title) async {
         return AlertDialog(
           backgroundColor: Color(0xff009688),
           title: Text(
-            title,
+            title + ' is Added',
             textAlign: TextAlign.center,
             style: TextStyle(color: Colors.white),
           ),
           actions: <Widget>[
             FlatButton(
-              onPressed: () { Navigator.pop(context);
-              Navigator.pop(context);},
+              onPressed: () {
+                Navigator.pop(context);
+                Navigator.pop(context);
+              },
               child: Text(
                 'OK',
                 style: TextStyle(color: Colors.white),

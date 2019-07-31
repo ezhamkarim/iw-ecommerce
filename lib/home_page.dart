@@ -198,7 +198,8 @@ class _DrawerNavState extends State<DrawerNav> {
 }
 
 class ProductCard extends StatelessWidget {
-  final String id, _image, _title, _seller, _price, _description;
+  final String id, _image, _title, _seller, _description;
+  final double _price;
 
   ProductCard(this.id, this._image, this._title, this._seller, this._price,
       this._description);
@@ -218,15 +219,20 @@ class ProductCard extends StatelessWidget {
                 topRight: Radius.circular(15.0),
               ),
               image: DecorationImage(
-                image: ExactAssetImage(_image),
+                image: NetworkImage(_image),
                 fit: BoxFit.cover,
               ),
             ),
           ),
           Container(
+
             width: 380.0,
             padding: EdgeInsets.only(left: 8.0, right: 8.0, bottom: 2.0),
-            color: Colors.teal[100],
+            
+            decoration: BoxDecoration(
+              color: Colors.teal[100],
+              borderRadius: BorderRadius.only(bottomLeft: Radius.circular(15.0), bottomRight: Radius.circular(15.0))
+            ),
             child: Row(
               children: <Widget>[
                 Column(
@@ -237,7 +243,7 @@ class ProductCard extends StatelessWidget {
                       style: TextStyle(fontSize: 18.0),
                     ),
                     Text(
-                      _seller,
+                      'by ' + _seller,
                       style: TextStyle(color: Color.fromARGB(172, 0, 0, 0)),
                     ),
                   ],
@@ -250,13 +256,15 @@ class ProductCard extends StatelessWidget {
                   color: Colors.teal,
                   child: Row(
                     children: <Widget>[
-                      Icon(Icons.add, color: Colors.white),
-                      Text('Add to cart',
-                          style: TextStyle(color: Colors.white)),
+                      Icon(Icons.add_shopping_cart, color: Colors.white),
                       SizedBox(
                         width: 12.0,
                       ),
-                      Text(_price, style: TextStyle(color: Colors.white)),
+                      Text(
+                          'RM ' +
+                              _price.toStringAsFixed(
+                                  _price.truncateToDouble() == _price ? 2 : 2),
+                          style: TextStyle(color: Colors.white)),
                     ],
                   ),
                 ),
@@ -272,41 +280,92 @@ class ProductCard extends StatelessWidget {
 class ProductList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      children: <Widget>[
-        ProductCard(
-          '0001',
-          'assets/images/nasi_dagang.png',
-          'Nasi Kerabu',
-          'Kak Senak',
-          "RM17.90",
-          'Very Delicious Fried Rice. 10/10.',
-        ),
-        ProductCard(
-          '0001',
-          'assets/images/nasi_dagang.png',
-          'Nasi Daging',
-          'Kak Enak',
-          "RM39.90",
-          'Very Delicious Fried Rice. 10/10.',
-        ),
-        ProductCard(
-          '0001',
-          'assets/images/nasi_dagang.png',
-          'Nasi Dagang',
-          'Kak Senah',
-          "RM14.90",
-          'Very Delicious Fried Rice. 10/10.',
-        ),
-        ProductCard(
-          '0001',
-          'assets/images/nasi_dagang.png',
-          'Nasi Keselasa',
-          'Kak Benak',
-          "RM7.90",
-          'Very Delicious Fried Rice. 10/10.',
-        ),
-      ],
+    return _buildBody(context);
+    // return ListView(
+    //   children: <Widget>[
+    //     ProductCard(
+    //       '0001',
+    //       'assets/images/nasi_dagang.png',
+    //       'Nasi Kerabu',
+    //       'Kak Senak',
+    //       "RM17.90",
+    //       'Very Delicious Fried Rice. 10/10.',
+    //     ),
+    //     ProductCard(
+    //       '0001',
+    //       'assets/images/nasi_dagang.png',
+    //       'Nasi Daging',
+    //       'Kak Enak',
+    //       "RM39.90",
+    //       'Very Delicious Fried Rice. 10/10.',
+    //     ),
+    //     ProductCard(
+    //       '0001',
+    //       'assets/images/nasi_dagang.png',
+    //       'Nasi Dagang',
+    //       'Kak Senah',
+    //       "RM14.90",
+    //       'Very Delicious Fried Rice. 10/10.',
+    //     ),
+    //     ProductCard(
+    //       '0001',
+    //       'assets/images/nasi_dagang.png',
+    //       'Nasi Keselasa',
+    //       'Kak Benak',
+    //       "RM7.90",
+    //       'Very Delicious Fried Rice. 10/10.',
+    //     ),
+    //   ],
+    // );
+  }
+
+  Widget _buildBody(BuildContext context) {
+    return StreamBuilder(
+      stream: Firestore.instance.collection('product').snapshots(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) return LinearProgressIndicator();
+        return _buildList(context, snapshot.data.documents);
+      },
     );
   }
+
+  Widget _buildList(BuildContext context, List<DocumentSnapshot> snapshot) {
+    return ListView(
+      children: snapshot.map((data) => _buildListItem(context, data)).toList(),
+    );
+  }
+
+  Widget _buildListItem(BuildContext context, DocumentSnapshot data) {
+    final product = Product.fromSnapshot(data);
+
+    return ProductCard(
+      "AAA",
+      product.productUrl,
+      product.name,
+      product.sellerName,
+      product.price,
+      'Dimasak oleh kahcurk Ey-chah ',
+    );
+  }
+}
+
+class Product {
+  final String name;
+  final double price;
+  final String sellerName;
+  final String productUrl;
+  final DocumentReference reference;
+
+  Product.fromMap(Map<String, dynamic> map, {this.reference})
+      : assert(map['name'] != null),
+        assert(map['price'] != null),
+        assert(map['sellerName'] != null),
+        assert(map['photoUrl'] !=null),
+        productUrl = map['photoUrl'],
+        sellerName = map['sellerName'],
+        name = map['name'],
+        price = map['price'];
+
+  Product.fromSnapshot(DocumentSnapshot snapshot)
+      : this.fromMap(snapshot.data, reference: snapshot.reference);
 }
