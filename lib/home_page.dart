@@ -281,42 +281,7 @@ class ProductList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _buildBody(context);
-    // return ListView(
-    //   children: <Widget>[
-    //     ProductCard(
-    //       '0001',
-    //       'assets/images/nasi_dagang.png',
-    //       'Nasi Kerabu',
-    //       'Kak Senak',
-    //       "RM17.90",
-    //       'Very Delicious Fried Rice. 10/10.',
-    //     ),
-    //     ProductCard(
-    //       '0001',
-    //       'assets/images/nasi_dagang.png',
-    //       'Nasi Daging',
-    //       'Kak Enak',
-    //       "RM39.90",
-    //       'Very Delicious Fried Rice. 10/10.',
-    //     ),
-    //     ProductCard(
-    //       '0001',
-    //       'assets/images/nasi_dagang.png',
-    //       'Nasi Dagang',
-    //       'Kak Senah',
-    //       "RM14.90",
-    //       'Very Delicious Fried Rice. 10/10.',
-    //     ),
-    //     ProductCard(
-    //       '0001',
-    //       'assets/images/nasi_dagang.png',
-    //       'Nasi Keselasa',
-    //       'Kak Benak',
-    //       "RM7.90",
-    //       'Very Delicious Fried Rice. 10/10.',
-    //     ),
-    //   ],
-    // );
+    
   }
 
   Widget _buildBody(BuildContext context) {

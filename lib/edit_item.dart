@@ -1,16 +1,11 @@
 import 'my_listings.dart';
 import 'package:flutter/material.dart';
 
-class MyItemEdit extends StatefulWidget {
-  @override
-  _MyItemEditState createState() => _MyItemEditState();
-}
-
-class _MyItemEditState extends State<MyItemEdit> {
+class MyItemEdit extends StatelessWidget {
   Dialogs dialogs = new Dialogs();
-  String name;
+  
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context,) {
     return Scaffold(
       appBar: AppBar(
           centerTitle: true,

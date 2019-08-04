@@ -1,7 +1,9 @@
+import 'package:sign_in_flutter/sign_in.dart';
 import 'add_item.dart';
 import 'edit_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class MyListings extends StatefulWidget {
   @override
@@ -13,40 +15,19 @@ class _MyListingsState extends State<MyListings> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-         centerTitle: true,
-        title: Container(
-          // To align the text to the center of the appbar
-          
-          child: Text(
-            
-            // Text with Home Food and white colored font
-            'Home Food',
-            style: TextStyle(color: Colors.white, fontFamily: 'LiterataBook'),
-          ),
-        ),
-        backgroundColor: Colors.teal
-      ),
-      body: ListView(
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.all(15.0),
-            child: new Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text('My Listings'),
-                ListFood(
-                  Image_location: 'assets/images/nasi_dagang.png',
-                  Image_name: 'Nasi Keisnin',
-                ),
-                ListFood(
-                  Image_location: 'assets/images/nasi_dagang.png',
-                  Image_name: 'Nasi Keselasa',
-                ),
-              ],
+          centerTitle: true,
+          title: Container(
+            // To align the text to the center of the appbar
+
+            child: Text(
+              // Text with Home Food and white colored font
+              'Home Food',
+              style: TextStyle(color: Colors.white, fontFamily: 'LiterataBook'),
             ),
           ),
-        ],
-      ),
+          backgroundColor: Colors.teal),
+      body: ListingList(),
+      
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(
@@ -93,17 +74,74 @@ class Dialogs {
   }
 }
 
-class ListFood extends StatelessWidget {
+class ListingList extends StatefulWidget {
+  @override
+  _ListingListState createState() => _ListingListState();
+}
+
+class _ListingListState extends State<ListingList> {
+  
+  @override
+  Widget build(BuildContext context) {
+    return _buildBody(context);
+  }
+
+  
+  Widget _buildBody(BuildContext context) {
+    return StreamBuilder(
+      stream: Firestore.instance.collection('product').where('sellerId', isEqualTo : userID).snapshots(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) return LinearProgressIndicator();
+        return _buildList(context, snapshot.data.documents);
+      },
+    );
+  }
+
+  Widget _buildList(BuildContext context, List<DocumentSnapshot> snapshot) {
+    return ListView(
+      children: snapshot.map((data) => _buildListItem(context, data, data.documentID)).toList(),
+    );
+  }
+
+  Widget _buildListItem(BuildContext context, DocumentSnapshot data, String documentID) {
+    final product = Listings.fromSnapshot(data);
+
+    return ListFoodCard(
+      product.productUrl,
+      product.name,
+      product.price,
+    );
+  }
+}
+
+class Listings {
+  final String name;
+  final double price;
+  final String productUrl;
+  final DocumentReference reference;
+
+  Listings.fromMap(Map<String, dynamic> map, {this.reference})
+      : assert(map['name'] != null),
+        assert(map['price'] != null),
+        assert(map['photoUrl'] != null),
+        productUrl = map['photoUrl'],
+        name = map['name'],
+        price = map['price'];
+
+  Listings.fromSnapshot(DocumentSnapshot snapshot)
+      : this.fromMap(snapshot.data, reference: snapshot.reference);
+}
+
+class ListFoodCard extends StatelessWidget {
   Dialogs dialogs = new Dialogs();
 
-  final String Image_location;
-  final String Image_name;
+  final String _image;
+  final String _title;
+  final double _price;
 
-  ListFood({
-    this.Image_location,
-    this.Image_name,
-  });
+  ListFoodCard(this._image, this._title, this._price);
 
+  MyItemEdit updateData = MyItemEdit();
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -118,9 +156,21 @@ class ListFood extends StatelessWidget {
       width: 400.0,
       child: Row(
         children: <Widget>[
-          Image.asset(
-            Image_location,
-            fit: BoxFit.fitHeight,
+          Expanded(
+            flex: 1,
+            child: Container(
+              height: 120.0,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(10.0),
+                  bottomLeft: Radius.circular(10.0),
+                ),
+                image: DecorationImage(
+                  image: NetworkImage(_image),
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
           ),
           Container(
             padding: EdgeInsets.all(10.0),
@@ -130,49 +180,52 @@ class ListFood extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Text(
-                  Image_name,
+                  _title,
                   style: TextStyle(color: Colors.white),
                 ),
                 Text(
-                  'RM 17.90',
+                  'Rm' +
+                      _price.toStringAsFixed(
+                          _price.truncateToDouble() == _price ? 2 : 2),
                   style: TextStyle(color: Colors.white, fontSize: 10),
                 )
               ],
             ),
           ),
-          Column(
-            verticalDirection: VerticalDirection.up,
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  children: <Widget>[
-                    GestureDetector(
-                      onTap: () {
-                        dialogs.information(context,
-                            'Are you sure want to delete this listing ?');
-                      },
-                      child: Icon(
-                        Icons.cancel,
-                        color: Colors.white,
+          Expanded(
+            child: Column(
+              verticalDirection: VerticalDirection.up,
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: <Widget>[
+                      GestureDetector(
+                        onTap: () {
+                          dialogs.information(context,
+                              'Are you sure want to delete this listing ?');
+                        },
+                        child: Icon(
+                          Icons.cancel,
+                          color: Colors.white,
+                        ),
                       ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => MyItemEdit()));
-                      },
-                      child: Icon(
-                        Icons.more_horiz,
-                        color: Colors.white,
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (context)=> MyItemEdit()));
+                          
+                        },
+                        child: Icon(
+                          Icons.more_horiz,
+                          color: Colors.white,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           )
         ],
       ),

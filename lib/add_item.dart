@@ -15,7 +15,6 @@ class MyItemAdd extends StatefulWidget {
 
 class _MyItemAddState extends State<MyItemAdd> {
   File _image;
-  String name;
   String photoUrl;
 
   Future getImage() async {
@@ -184,7 +183,9 @@ class _MyItemAddState extends State<MyItemAdd> {
                             'price': price,
                             'sellerId': userID,
                             'sellerName': userName,
-                            'photoUrl': photoUrl
+                            'photoUrl': photoUrl,
+                            
+                            
                           };
 
                           crudObj
@@ -195,6 +196,7 @@ class _MyItemAddState extends State<MyItemAdd> {
                           /* Firestore.instance.collection('product').add(map).catchError(() {
                             print('Fattah Amien kacak <3');
                           }); */
+
                         },
                         color: Colors.blue,
                         child: Text(
