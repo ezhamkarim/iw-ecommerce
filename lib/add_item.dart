@@ -30,7 +30,7 @@ class _MyItemAddState extends State<MyItemAdd> {
     String fileName = basename(_image.path);
     StorageReference firebaseStorageRef =
         FirebaseStorage.instance.ref().child(fileName);
-    StorageUploadTask uploadTask = firebaseStorageRef.putFile(_image);
+    StorageUploadTask uploadTask = firebaseStorageRef.putFile(_image);//TODO Progress bar 
     StorageTaskSnapshot taskSnapshot = await uploadTask.onComplete;
 
     final ref = FirebaseStorage.instance.ref().child(fileName);
@@ -85,6 +85,7 @@ class _MyItemAddState extends State<MyItemAdd> {
                       padding: const EdgeInsets.all(12.0),
                       child: TextFormField(
                         controller: textInputName,
+                        textCapitalization: TextCapitalization.words,
                         //TODO implemention to get the data from the text field
                         decoration: InputDecoration(
                           labelText: 'Product Name',
@@ -101,6 +102,7 @@ class _MyItemAddState extends State<MyItemAdd> {
                             minLines: 4,
                             maxLines: 4,
                             controller: textInputDescription,
+                            textCapitalization: TextCapitalization.sentences,
                             textAlign: TextAlign
                                 .start, //TODO implemention to get the data from the text field
                             decoration: InputDecoration(
@@ -184,8 +186,7 @@ class _MyItemAddState extends State<MyItemAdd> {
                             'sellerId': userID,
                             'sellerName': userName,
                             'photoUrl': photoUrl,
-                            
-                            
+                            'productID': ''
                           };
 
                           crudObj
@@ -196,7 +197,7 @@ class _MyItemAddState extends State<MyItemAdd> {
                           /* Firestore.instance.collection('product').add(map).catchError(() {
                             print('Fattah Amien kacak <3');
                           }); */
-
+                          
                         },
                         color: Colors.blue,
                         child: Text(
