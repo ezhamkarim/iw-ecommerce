@@ -4,6 +4,7 @@ import 'edit_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'crud.dart';
 
 class MyListings extends StatefulWidget {
   @override
@@ -11,6 +12,9 @@ class MyListings extends StatefulWidget {
 }
 
 class _MyListingsState extends State<MyListings> {
+
+  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,7 +45,9 @@ class _MyListingsState extends State<MyListings> {
 }
 
 class Dialogs {
-  information(BuildContext context, String title) {
+  CrudMethods crudObj = CrudMethods();
+  
+  deleteItem(BuildContext context, String docID) {
     return showDialog(
         context: context,
         barrierDismissible: true,
@@ -49,7 +55,7 @@ class Dialogs {
           return AlertDialog(
             backgroundColor: Color(0xffB92D00),
             title: Text(
-              title,
+              'Are you sure to delete?',
               style: TextStyle(color: Colors.white),
             ),
             actions: <Widget>[
@@ -61,8 +67,10 @@ class Dialogs {
                 ),
               ),
               FlatButton(
-                onPressed: () => Navigator.pop(context,
-                    MaterialPageRoute(builder: (context) => MyListings())),
+                onPressed: () {
+                  crudObj.deleteData(docID);
+                  Navigator.pop(context);
+                },
                 child: Text(
                   'OK',
                   style: TextStyle(color: Colors.white),
@@ -100,6 +108,7 @@ class _ListingListState extends State<ListingList> {
   Widget _buildList(BuildContext context, List<DocumentSnapshot> snapshot) {
     return ListView(
       children: snapshot.map((data) => _buildListItem(context, data, data.documentID)).toList(),
+      padding: EdgeInsets.only(bottom: 80),
     );
   }
 
@@ -110,6 +119,8 @@ class _ListingListState extends State<ListingList> {
       product.productUrl,
       product.name,
       product.price,
+      documentID,
+      product.description
     );
   }
 }
@@ -118,12 +129,15 @@ class Listings {
   final String name;
   final double price;
   final String productUrl;
+  final String description;
   final DocumentReference reference;
 
   Listings.fromMap(Map<String, dynamic> map, {this.reference})
       : assert(map['name'] != null),
         assert(map['price'] != null),
         assert(map['photoUrl'] != null),
+        assert(map['description']!=null),
+        description = map['description'],
         productUrl = map['photoUrl'],
         name = map['name'],
         price = map['price'];
@@ -134,14 +148,15 @@ class Listings {
 
 class ListFoodCard extends StatelessWidget {
   Dialogs dialogs = new Dialogs();
-
+  String productID;
   final String _image;
   final String _title;
   final double _price;
+  final String _description;
 
-  ListFoodCard(this._image, this._title, this._price);
+  ListFoodCard(this._image, this._title, this._price,this.productID,this._description);
 
-  MyItemEdit updateData = MyItemEdit();
+  
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -203,8 +218,9 @@ class ListFoodCard extends StatelessWidget {
                     children: <Widget>[
                       GestureDetector(
                         onTap: () {
-                          dialogs.information(context,
-                              'Are you sure want to delete this listing ?');
+                          dialogs.deleteItem(context,
+                              productID);
+                        
                         },
                         child: Icon(
                           Icons.cancel,
@@ -213,8 +229,8 @@ class ListFoodCard extends StatelessWidget {
                       ),
                       GestureDetector(
                         onTap: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context)=> MyItemEdit()));
-                          
+                          Navigator.push(context, MaterialPageRoute(builder: (context)=> MyItemEdit(productID,_title,_description,_price,_image)));
+                          print('HAIIII '+ productID);
                         },
                         child: Icon(
                           Icons.more_horiz,

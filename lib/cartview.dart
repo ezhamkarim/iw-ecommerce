@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:sign_in_flutter/sign_in.dart';
 import 'checkout.dart';
 import 'cart.dart';
 
@@ -39,6 +40,7 @@ class _BakulState extends State<Bakul> {
   _BakulState(this._sellerId);
   List<Map<String, dynamic>> productsList;
 
+    
   @override
   Widget build(BuildContext context) {
 
@@ -66,6 +68,7 @@ class _BakulState extends State<Bakul> {
                     }),
               ),
               ListView.builder(
+               // Firestore.instance.collection('users').document(userID).collection('cart').document(_sellerId).setData({'products' : }),
                 shrinkWrap: true,
                 itemCount: cart.cart[_sellerId].length,
                 itemBuilder: (context, index) {
@@ -88,7 +91,7 @@ class _BakulState extends State<Bakul> {
               Column(
                 children: <Widget>[
                   
-                  Text('RM ' ), //TODO
+                  Text('RM '), //TODO
                   SizedBox(
                     height: 20.0,
                   ),
@@ -148,6 +151,8 @@ class _CartItemState extends State<CartItem> {
     var cart = Provider.of<Cart>(context);
     DocumentReference ref =
         Firestore.instance.collection('product').document(_productId);
+  
+        
     return StreamBuilder(
         stream: ref.snapshots(),
         builder: (context, snapshot) {

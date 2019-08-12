@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:sign_in_flutter/crud.dart';
 
 class Cart extends ChangeNotifier {
+  CrudMethods crudObj = CrudMethods();
   Map<String, List<Map<String, dynamic>>> cart = {
     'RdzEbID4WdSW5so1XyO97bvbo3R2': [
       {
@@ -52,21 +54,14 @@ class Cart extends ChangeNotifier {
     return length;
   }
 
- void getTotalPrice(String sellerId, String productId ,double itemTotal) {
-   
-   double totalPrice = 0; 
-    
-  cart[sellerId].forEach((productMap){
-    if(productId==productMap['productId']){
-      totalPrice +=itemTotal;
-    }
-  });
+ double getSellerTotal(String sellerId) {
+    double total =0.0; // Total price of products from sellerId
 
-  
-print('THIS IS THE TOTAL PRICE  ' + totalPrice.toString());
-   
-    
-    return ;
+    cart[sellerId].forEach((productMap) {
+      total += productMap['itemTotal'];
+    });
+  print('TOTAL PRICE '+sellerId + '  '+total.toString());
+    return total;
   }
 
   Map<String, dynamic> getProduct(String sellerId, String productId) {
@@ -94,7 +89,9 @@ print('THIS IS THE TOTAL PRICE  ' + totalPrice.toString());
            itemTotal = quantity*ds.data['price'];
         print('THIS IS ITEM ' +productId+ ' TOTAL PRICE ' + itemTotal.toString());
         //print(itemTotal.toString());
-       getTotalPrice(sellerId, productId, itemTotal);
+         productMap['itemTotal'] = itemTotal;
+
+         getSellerTotal(sellerId);
       });
       
     
@@ -115,7 +112,19 @@ print('THIS IS THE TOTAL PRICE  ' + totalPrice.toString());
       }
       _sellerId = sellerId;  
     });
-    getItemTotal(_sellerId, productId, quantity);
+   getItemTotal(_sellerId, productId, quantity);
+
+    Map<String, Map< String, List<Map<String,dynamic>>>> newQuantity ={
+      'cart' : {
+      _sellerId : [
+        {
+          'productId':productId,
+          'quantity' : quantity
+        }
+      ]
+      }
+    };
+    //crudObj.updateQuantity(newQuantity);
     print('THIS IS '+ productId+ ' QUANTITY ' + quantity.toString());
     //print('THIS IS ITEM TOTAL' + price.toString());
     return quantity;
@@ -124,25 +133,49 @@ print('THIS IS THE TOTAL PRICE  ' + totalPrice.toString());
   void addProduct(String sellerId, String productId, [int quantity = 1]) {
     bool increment = false;
     if (cart.containsKey(sellerId)) {
+      
       cart[sellerId].forEach((productMap) {
         if (productMap.containsValue(productId)) {
           increaseQuantity(productId, quantity);
           increment = true;
         }
       });
+      
       if (!increment) {
         cart[sellerId].add({
           'productId': productId,
-          'quantity': quantity,
+          'quantity': quantity,  
         });
+        Map<String, Map< String,List<Map<String,dynamic>>>> cartSellerData = {
+    'cart': {
+     sellerId: [
+      {
+        'productId': productId,
+        'quantity': quantity,
       }
+    ]
+    }
+  };
+  //crudObj.addSellerDatatoCart('users', cartSellerData);
+      }
+      
     } else {
       cart[sellerId] = List<Map<String, dynamic>>();
       cart[sellerId].add({
         'productId': productId,
         'quantity': quantity,
       });
+       Map<String, dynamic> cartData =
+      {
+        'productId': productId,
+        'quantity': quantity,
+      }
+       ;
+  //crudObj.addNewProducttoCart('users', cartData, sellerId);
     }
+
+    
+   
   }
 
   void increaseQuantity(String productId, [int increment = 1]) {
