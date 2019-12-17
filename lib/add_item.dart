@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'crud.dart';
 import 'dart:io';
@@ -30,7 +31,8 @@ class _MyItemAddState extends State<MyItemAdd> {
     String fileName = basename(_image.path);
     StorageReference firebaseStorageRef =
         FirebaseStorage.instance.ref().child(fileName);
-    StorageUploadTask uploadTask = firebaseStorageRef.putFile(_image);//TODO Progress bar 
+    StorageUploadTask uploadTask =
+        firebaseStorageRef.putFile(_image); //TODO Progress bar
     StorageTaskSnapshot taskSnapshot = await uploadTask.onComplete;
 
     final ref = FirebaseStorage.instance.ref().child(fileName);
@@ -85,8 +87,10 @@ class _MyItemAddState extends State<MyItemAdd> {
                       padding: const EdgeInsets.all(12.0),
                       child: TextFormField(
                         controller: textInputName,
+                        inputFormatters: [
+                              LengthLimitingTextInputFormatter(15)
+                            ],
                         textCapitalization: TextCapitalization.words,
-                        //TODO implemention to get the data from the text field
                         decoration: InputDecoration(
                           labelText: 'Product Name',
                           border: OutlineInputBorder(
@@ -99,14 +103,16 @@ class _MyItemAddState extends State<MyItemAdd> {
                     Container(
                         padding: const EdgeInsets.all(12.0),
                         child: TextFormField(
-                            minLines: 4,
-                            maxLines: 4,
+                            minLines: 1,
+                            maxLines: 2,
                             controller: textInputDescription,
+                            inputFormatters: [
+                              LengthLimitingTextInputFormatter(20)
+                            ],
                             textCapitalization: TextCapitalization.sentences,
-                            textAlign: TextAlign
-                                .start, //TODO implemention to get the data from the text field
+                            textAlign: TextAlign.start,
                             decoration: InputDecoration(
-                                labelText: 'Description',
+                                labelText: 'Short description',
                                 border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(6.0),
                                     borderSide: BorderSide())))),
@@ -115,7 +121,9 @@ class _MyItemAddState extends State<MyItemAdd> {
                         child: TextFormField(
                             controller: textInputPrice,
                             keyboardType: TextInputType.number,
-                            //TODO implemention to get the data from the text field
+                            inputFormatters: [
+                              LengthLimitingTextInputFormatter(3)
+                            ],
                             decoration: InputDecoration(
                                 labelText: 'Price',
                                 border: OutlineInputBorder(
@@ -125,7 +133,7 @@ class _MyItemAddState extends State<MyItemAdd> {
                       onTap: () {
                         print('Container Tapped');
                         getImage();
-                      }, // TODO input image function & replace image
+                      },
                       child: Container(
                         margin: EdgeInsets.all(15.0),
                         padding: const EdgeInsets.all(12.0),
@@ -151,6 +159,9 @@ class _MyItemAddState extends State<MyItemAdd> {
                     Center(
                       child: RaisedButton(
                         onPressed: () {
+                          if(textInputDescription==null||textInputName==null||textInputPrice==null){
+                            dialogInputInvalid(context);
+                          }
                           uploadPic(context);
                           confirmImageDialog(context);
                         },
@@ -177,6 +188,11 @@ class _MyItemAddState extends State<MyItemAdd> {
                       ),
                       child: RaisedButton(
                         onPressed: () {
+
+                          if(textInputDescription.text==''||textInputName.text==''||textInputPrice.text==''||photoUrl==null){
+                            dialogInputInvalid(context);
+                            return;
+                          }
                           double price = double.parse(textInputPrice.text);
 
                           Map<String, dynamic> productData = {
@@ -197,7 +213,6 @@ class _MyItemAddState extends State<MyItemAdd> {
                           /* Firestore.instance.collection('product').add(map).catchError(() {
                             print('Fattah Amien kacak <3');
                           }); */
-                          
                         },
                         color: Colors.blue,
                         child: Text(
@@ -214,6 +229,32 @@ class _MyItemAddState extends State<MyItemAdd> {
         ],
       ),
     );
+  }
+  dialogInputInvalid(BuildContext context){
+    return showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            backgroundColor: Color(0xffB92D00),
+            title: Text(
+              'Input invalid!',
+              style: TextStyle(color: Colors.white),
+            ),
+            actions: <Widget>[
+            
+              FlatButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text(
+                  'Ok',
+                  style: TextStyle(color: Colors.white),
+                ),
+              )
+            ],
+          );
+        });
   }
 }
 

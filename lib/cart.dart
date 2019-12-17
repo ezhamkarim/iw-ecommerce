@@ -58,6 +58,7 @@ class Cart extends ChangeNotifier {
     double total =0.0; // Total price of products from sellerId
 
     cart[sellerId].forEach((productMap) {
+      getItemTotal(sellerId, productMap['productId'], productMap['quantity']);
       total += productMap['itemTotal'];
     });
   print('TOTAL PRICE '+sellerId + '  '+total.toString());
@@ -86,13 +87,15 @@ class Cart extends ChangeNotifier {
           .document(productId)
           .get()
           .then((ds) {
-           itemTotal = quantity*ds.data['price'];
+           itemTotal = productMap['quantity'] *ds.data['price'];
         print('THIS IS ITEM ' +productId+ ' TOTAL PRICE ' + itemTotal.toString());
         //print(itemTotal.toString());
          productMap['itemTotal'] = itemTotal;
 
-         getSellerTotal(sellerId);
+         //getSellerTotal(sellerId);
+         print(JsonEncoder.withIndent('  ').convert(cart));
       });
+                                                              
       
     
     });
@@ -112,7 +115,7 @@ class Cart extends ChangeNotifier {
       }
       _sellerId = sellerId;  
     });
-   getItemTotal(_sellerId, productId, quantity);
+   //getItemTotal(_sellerId, productId, quantity);
 
     Map<String, Map< String, List<Map<String,dynamic>>>> newQuantity ={
       'cart' : {
