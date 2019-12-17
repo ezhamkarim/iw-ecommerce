@@ -1,3 +1,5 @@
+import 'package:flutter/services.dart';
+
 import 'my_listings.dart';
 import 'dart:async';
 import 'dart:io';
@@ -111,6 +113,9 @@ class _MyItemEditState extends State<MyItemEdit> {
                         child: TextFormField(
                             controller: textInputName,
                             textCapitalization: TextCapitalization.words,
+                            inputFormatters: [
+                              LengthLimitingTextInputFormatter(15)
+                            ],
 
                             //TODO implemention to get the data from the text field
                             decoration: InputDecoration(
@@ -123,13 +128,17 @@ class _MyItemEditState extends State<MyItemEdit> {
                         padding: const EdgeInsets.all(12.0),
                         child: TextFormField(
                             controller: textInputDescription,
+                            inputFormatters: [
+                              LengthLimitingTextInputFormatter(20)
+                            ],
                             textCapitalization: TextCapitalization.sentences,
-                            minLines: 4,
-                            maxLines: 4,
+                            minLines: 1,
+                            maxLines: 2,
                             textAlign: TextAlign
-                                .start, //TODO implemention to get the data from the text field
+                                .start, 
+                            //TODO implemention to get the data from the text field
                             decoration: InputDecoration(
-                                labelText: 'Description',
+                                labelText: 'Short description',
                                 hintText: _description,
                                 border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(6.0),
@@ -139,9 +148,13 @@ class _MyItemEditState extends State<MyItemEdit> {
                         child: TextFormField(
                             controller: textInputPrice,
                             keyboardType: TextInputType.number,
+                            inputFormatters: [
+                              LengthLimitingTextInputFormatter(3)
+                            ],
                             //TODO implemention to get the data from the text field
                             decoration: InputDecoration(
                                 labelText: 'Price',
+                                
                                 hintText: _price.toString(),
                                 border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(6.0),
@@ -195,7 +208,10 @@ class _MyItemEditState extends State<MyItemEdit> {
                       ),
                       child: RaisedButton(
                         onPressed: () {
-                          //['name'] = textInputName.text;
+                          if(textInputDescription.text==''||textInputName.text==''||textInputPrice.text==''||photoUrl==null){
+                            dialogInputInvalid(context);
+                            return;
+                          }
                           double price = double.parse(textInputPrice.text);
 
                           newValue = {
@@ -205,7 +221,7 @@ class _MyItemEditState extends State<MyItemEdit> {
                             'photoUrl': photoUrl
                           };
                           print('TESTT1');
-                          crudObj.updateData(_productID, newValue);
+                          crudObj.updateData(_productID, newValue, 'product');
                           print('TESTT2');
                           dialogs.information(context, textInputName.text);
                         },
@@ -224,6 +240,33 @@ class _MyItemEditState extends State<MyItemEdit> {
         ],
       ),
     );
+  }
+
+  dialogInputInvalid(BuildContext context){
+    return showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            backgroundColor: Color(0xffB92D00),
+            title: Text(
+              'Input is Invalid!',
+              style: TextStyle(color: Colors.white),
+            ),
+            actions: <Widget>[
+            
+              FlatButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text(
+                  'Ok',
+                  style: TextStyle(color: Colors.white),
+                ),
+              )
+            ],
+          );
+        });
   }
 }
 

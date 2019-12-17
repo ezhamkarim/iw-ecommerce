@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:sign_in_flutter/crud.dart';
 import 'package:sign_in_flutter/orderverification.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:sign_in_flutter/sign_in.dart';
+import 'orderverification.dart';
 
 class MyOrdersPage extends StatefulWidget {
   @override
@@ -8,8 +12,6 @@ class MyOrdersPage extends StatefulWidget {
 }
 
 class _MyOrdersPageState extends State<MyOrdersPage> {
-  Dialogs dialogs = new Dialogs();
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,194 +27,243 @@ class _MyOrdersPageState extends State<MyOrdersPage> {
             ),
           ),
           backgroundColor: Colors.teal),
-      body: ListView(
+      body: Column(
         children: <Widget>[
-          Padding(
-            padding: EdgeInsets.all(15.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                Container(
-                  alignment: Alignment.centerLeft,
-                  child: Text('My Orders'),
-                ),
-                Container(
-                  decoration: new BoxDecoration(
-                    color: Color(0xff009688),
-                    borderRadius: new BorderRadius.all(Radius.circular(10.0)),
-                  ),
-                  margin: EdgeInsets.all(15.0),
-                  padding: EdgeInsets.all(10.0),
-                  height: 100.0,
-                  child: ListTile(
-                    title: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          'Kak Esah Kitchen',
-                          style: TextStyle(
-                            color: Colors.white,
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              OrderLists(
-                                prod_name: 'Nasi Keisnin',
-                                prod_quantity: '2',
-                              ),
-                              OrderLists(
-                                prod_name: 'Nasi Keselasa',
-                                prod_quantity: '1',
-                              ),
-                              OrderLists(
-                                prod_name: 'Nasi Kerabu',
-                                prod_quantity: '3',
-                              )
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    trailing: Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: <Widget>[
-                        GestureDetector(
-                          onTap: () {
-                            dialogs.information(context,
-                                'Are you sure want to cancel this order');
-                          },
-                          child: Icon(
-                            Icons.cancel,
-                            color: Colors.white30,
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                ),
-                Container(
-                  alignment: Alignment.centerLeft,
-                  child: Text('Confirmed Orders'),
-                ),
-                Container(
-                  decoration: new BoxDecoration(
-                    color: Color(0xff954F4F),
-                    borderRadius: new BorderRadius.all(Radius.circular(10.0)),
-                  ),
-                  margin: EdgeInsets.all(15.0),
-                  height: 100.0,
-                  
-                  child: Container(
-                    padding: EdgeInsets.all(10.0),
-                    child: ListTile(
-                      title: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Text(
-                            'Cawkurk Ey Chah Bochawh',
-                            style: TextStyle(
-                              color: Colors.white,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                OrderLists(
-                                  prod_name: 'Nasi Daging Manusia',
-                                  prod_quantity: '4',
-                                ),
-                                OrderLists(
-                                  prod_name: 'Nasi Kerabu Depan',
-                                  prod_quantity: '1',
-                                )
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      trailing: Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: <Widget>[
-                          InkWell(
-                            onTap: () {
-                              Navigator.push(context, MaterialPageRoute(
-                            builder: (context)=> MyOrderVerification()
-                          ));
-                            },
-                            child: Icon(
-                              Icons.arrow_forward,
-                              color: Colors.white30,
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                Container(
-                  alignment: Alignment.centerLeft,
-                  child: Text('Paid Orders'),
-                ),
-                Container(
-                  decoration: new BoxDecoration(
-                    color: Color(0xff954F4F),
-                    borderRadius: new BorderRadius.all(Radius.circular(10.0)),
-                  ),
-                  margin: EdgeInsets.all(15.0),
-                  height: 100.0,
-                  
-                  child: Container(
-                    padding: EdgeInsets.all(10.0),
-                    child: ListTile(
-                      title: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Text(
-                            'Cawkurk Ey Chah Bochawh',
-                            style: TextStyle(
-                              color: Colors.white,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                OrderLists(
-                                  prod_name: 'Nasi Daging Manusia',
-                                  prod_quantity: '4',
-                                ),
-                                OrderLists(
-                                  prod_name: 'Nasi Kerabu Depan',
-                                  prod_quantity: '1',
-                                )
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      
-                    ),
-                  ),
-                ),
-              ],
+          Text('My Orders'),
+          Expanded(
+            child: StreamBuilder<QuerySnapshot>(
+              stream: Firestore.instance
+                  .collection('orders')
+                  .where('buyerId', isEqualTo: userID)
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) return LinearProgressIndicator();
+                return _buildList(context, snapshot.data.documents);
+              },
             ),
-          )
+          ),
         ],
       ),
     );
   }
+
+  Widget _buildList(BuildContext context, List<DocumentSnapshot> snapshot) {
+    return ListView(
+      children: snapshot
+          .map((data) => _buildListItem(context, data, data.documentID))
+          .toList(),
+    );
+  }
+
+  Widget _buildListItem(
+      BuildContext context, DocumentSnapshot data, String documentID) {
+    return OrderLists(
+        data['productName'],
+        data['sellerId'],
+        data['sellerName'],
+        data['quantity'],
+        data['isConfirmed'],
+        data['isPaid'],
+        data['price'],
+        data['productUrl'],
+        documentID,
+        data['isCOD'],
+        data['sellerLocation']);
+  }
 }
 
-class Dialogs {
-  information(BuildContext context, String title) {
+class OrderLists extends StatefulWidget {
+  String productName;
+  String sellerName;
+  String sellerId;
+  int quantity;
+  bool isConfirmed;
+  bool isPaid;
+  String documentID, sellerLocation;
+  double price;
+  String productImage;
+  bool isCod;
+  OrderLists(
+      this.productName,
+      this.sellerId,
+      this.sellerName,
+      this.quantity,
+      this.isConfirmed,
+      this.isPaid,
+      this.price,
+      this.productImage,
+      this.documentID,
+      this.isCod,
+      this.sellerLocation);
+
+  @override
+  _OrderListsState createState() => _OrderListsState(
+      productName,
+      sellerId,
+      sellerName,
+      quantity,
+      isConfirmed,
+      isPaid,
+      price,
+      productImage,
+      documentID,
+      isCod,
+      sellerLocation);
+}
+
+class _OrderListsState extends State<OrderLists> {
+  String _productName;
+  String _sellerId;
+  String _sellerName;
+  int _quantity;
+  bool _isConfirmed;
+  bool _isPaid;
+  String _documentID, _sellerLocation;
+  double _price;
+  String _productImage;
+  bool _isCod;
+  _OrderListsState(
+      this._productName,
+      this._sellerId,
+      this._sellerName,
+      this._quantity,
+      this._isConfirmed,
+      this._isPaid,
+      this._price,
+      this._productImage,
+      this._documentID,
+      this._isCod,
+      this._sellerLocation);
+
+  CrudMethods crudObj = CrudMethods();
+
+  @override
+  Widget build(BuildContext context) {
+    Color backgroundColor = Colors.orange;
+    IconButton icon = IconButton(
+      icon: Icon(Icons.cancel, color: Colors.white30),
+      onPressed: () {
+        information(
+            context, 'Are you sure want to cancel this order', _documentID);
+      },
+    );
+
+    return StreamBuilder(
+        stream: Firestore.instance
+            .collection('users')
+            .document(_sellerId)
+            .snapshots(),
+        builder: (context, snapshot) {
+          var noPhone=snapshot.data['noPhone'];
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12.0),
+            child: StreamBuilder(
+                stream: Firestore.instance
+                    .collection('orders')
+                    .document(_documentID)
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot.data['isConfirmed']) {
+                    backgroundColor = Colors.teal;
+                    icon = IconButton(
+                      icon: Icon(Icons.arrow_forward, color: Colors.white30),
+                      onPressed: () {
+                        if (snapshot.data['isCOD']) {
+                          dialogCod(context, _sellerLocation, _documentID);
+                        } else {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => MyOrderVerification(
+                                    _productName,
+                                    _sellerId,
+                                    _sellerName,
+                                    _quantity,
+                                    _price,
+                                    _productImage,
+                                    _documentID)),
+                          );
+                        }
+                      },
+                    );
+                    if (snapshot.data['isPaid']) {
+                      backgroundColor = Colors.teal;
+                      icon = IconButton(
+                        icon: Icon(Icons.check_circle, color: Colors.white30),
+                        onPressed: () {},
+                      );
+                    }
+                  }
+                  return Card(
+                    color: backgroundColor,
+                    child: ListTileTheme(
+                      textColor: Colors.white,
+                      child: ListTile(
+                        title: Row(
+                          children: <Widget>[
+                            StreamBuilder(
+                              stream: Firestore.instance
+                                  .collection('orders')
+                                  .document(_documentID)
+                                  .snapshots(),
+                              builder: (context, snapshot) {
+                                if (snapshot.data['isCOD']) {
+                                  return Row(
+                                    children: <Widget>[
+                                      Icon(
+                                        Icons.motorcycle,
+                                        color: Colors.yellow,
+                                      ),
+                                      Text(
+                                        '\t[COD]',
+                                      ),
+                                    ],
+                                  );
+                                }
+                                return Icon(
+                                  Icons.credit_card,
+                                  color: Colors.yellow,
+                                );
+                              },
+                            ),
+                            Text(
+                              ' ' + _productName,
+                            ),
+                          ],
+                        ),
+                        subtitle: Text('by ' +
+                            _sellerName +
+                            ' (Quantity ' +
+                            _quantity.toString() +
+                            ')\n' +
+                            'No Phone' +
+                            noPhone),
+                        trailing: Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: <Widget>[
+                            icon
+                            /* GestureDetector(
+                      onTap: () {
+                        information(
+                            context, 'Are you sure want to cancel this order');
+                      },
+                      child: Icon(
+                        Icons.cancel,
+                        color: Colors.white30,
+                      ),
+                    ) */
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                }),
+          );
+        });
+  }
+
+  information(BuildContext context, String title, String docID) {
     return showDialog(
         context: context,
         barrierDismissible: true,
@@ -232,7 +283,11 @@ class Dialogs {
                 ),
               ),
               FlatButton(
-                onPressed: () => Navigator.pop(context),
+                onPressed: () {
+                  crudObj.deleteData(docID, 'orders');
+                  setState(() {});
+                  Navigator.pop(context);
+                },
                 child: Text(
                   'Yes',
                   style: TextStyle(color: Colors.white),
@@ -242,21 +297,40 @@ class Dialogs {
           );
         });
   }
-}
 
-class OrderLists extends StatelessWidget {
-  final String prod_name;
-  final String prod_quantity;
+  dialogCod(BuildContext context, String sellerLocation, String docID) {
+    return showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            backgroundColor: Colors.teal,
+            title: Text(
+                'Are you sure ' + sellerLocation + ' is location for COD?  '),
+            actions: <Widget>[
+              FlatButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text(
+                  'Cancel',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+              FlatButton(
+                onPressed: () {
+                  Map<String, dynamic> paymentImageData = {
+                    'productPaymentProof': 'COD Location Accepted'
+                  };
 
-  OrderLists({
-    this.prod_name,
-    this.prod_quantity,
-  });
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      '- ' + prod_name + ' ' + '(' + prod_quantity + ')',
-      style: TextStyle(color: Colors.white70, fontSize: 12),
-    );
+                  crudObj.updateData(docID, paymentImageData, 'orders');
+                  Navigator.pop(context);
+                },
+                child: Text(
+                  'Yes',
+                  style: TextStyle(color: Colors.white),
+                ),
+              )
+            ],
+          );
+        });
   }
 }

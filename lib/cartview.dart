@@ -43,8 +43,9 @@ class _BakulState extends State<Bakul> {
     
   @override
   Widget build(BuildContext context) {
-
+    
     var cart = Provider.of<Cart>(context);
+    //cart.getSellerTotal(_sellerId);
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: <Widget>[

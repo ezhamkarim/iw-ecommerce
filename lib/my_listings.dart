@@ -12,9 +12,6 @@ class MyListings extends StatefulWidget {
 }
 
 class _MyListingsState extends State<MyListings> {
-
-  
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,7 +28,6 @@ class _MyListingsState extends State<MyListings> {
           ),
           backgroundColor: Colors.teal),
       body: ListingList(),
-      
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(
@@ -46,7 +42,7 @@ class _MyListingsState extends State<MyListings> {
 
 class Dialogs {
   CrudMethods crudObj = CrudMethods();
-  
+
   deleteItem(BuildContext context, String docID) {
     return showDialog(
         context: context,
@@ -68,7 +64,7 @@ class Dialogs {
               ),
               FlatButton(
                 onPressed: () {
-                  crudObj.deleteData(docID);
+                  crudObj.deleteData(docID,'product');
                   Navigator.pop(context);
                 },
                 child: Text(
@@ -88,16 +84,17 @@ class ListingList extends StatefulWidget {
 }
 
 class _ListingListState extends State<ListingList> {
-  
   @override
   Widget build(BuildContext context) {
     return _buildBody(context);
   }
 
-  
   Widget _buildBody(BuildContext context) {
     return StreamBuilder(
-      stream: Firestore.instance.collection('product').where('sellerId', isEqualTo : userID).snapshots(),
+      stream: Firestore.instance
+          .collection('product')
+          .where('sellerId', isEqualTo: userID)
+          .snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) return LinearProgressIndicator();
         return _buildList(context, snapshot.data.documents);
@@ -107,21 +104,19 @@ class _ListingListState extends State<ListingList> {
 
   Widget _buildList(BuildContext context, List<DocumentSnapshot> snapshot) {
     return ListView(
-      children: snapshot.map((data) => _buildListItem(context, data, data.documentID)).toList(),
+      children: snapshot
+          .map((data) => _buildListItem(context, data, data.documentID))
+          .toList(),
       padding: EdgeInsets.only(bottom: 80),
     );
   }
 
-  Widget _buildListItem(BuildContext context, DocumentSnapshot data, String documentID) {
+  Widget _buildListItem(
+      BuildContext context, DocumentSnapshot data, String documentID) {
     final product = Listings.fromSnapshot(data);
 
-    return ListFoodCard(
-      product.productUrl,
-      product.name,
-      product.price,
-      documentID,
-      product.description
-    );
+    return ListFoodCard(product.productUrl, product.name, product.price,
+        documentID, product.description);
   }
 }
 
@@ -136,7 +131,7 @@ class Listings {
       : assert(map['name'] != null),
         assert(map['price'] != null),
         assert(map['photoUrl'] != null),
-        assert(map['description']!=null),
+        assert(map['description'] != null),
         description = map['description'],
         productUrl = map['photoUrl'],
         name = map['name'],
@@ -154,9 +149,9 @@ class ListFoodCard extends StatelessWidget {
   final double _price;
   final String _description;
 
-  ListFoodCard(this._image, this._title, this._price,this.productID,this._description);
+  ListFoodCard(
+      this._image, this._title, this._price, this.productID, this._description);
 
-  
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -218,9 +213,7 @@ class ListFoodCard extends StatelessWidget {
                     children: <Widget>[
                       GestureDetector(
                         onTap: () {
-                          dialogs.deleteItem(context,
-                              productID);
-                        
+                          dialogs.deleteItem(context, productID);
                         },
                         child: Icon(
                           Icons.cancel,
@@ -229,8 +222,14 @@ class ListFoodCard extends StatelessWidget {
                       ),
                       GestureDetector(
                         onTap: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context)=> MyItemEdit(productID,_title,_description,_price,_image)));
-                          print('HAIIII '+ productID);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => MyItemEdit(productID,
+                                  _title, _description, _price, _image),
+                            ),
+                          );
+                          print('HAIIII ' + productID);
                         },
                         child: Icon(
                           Icons.more_horiz,

@@ -1,3 +1,6 @@
+
+import 'package:sign_in_flutter/edit_location.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'manage_orders.dart';
 import 'my_listings.dart';
 import 'my_order.dart';
@@ -10,27 +13,27 @@ class MySellerProfile extends StatelessWidget {
     return Scaffold(
       // making AppBar with green color and Home Food Text
       appBar: AppBar(
-        centerTitle: true,
-        title: Container(
-          // To align the text to the center of the appbar
-          
-          child: Text(
-            
-            // Text with Home Food and white colored font
-            'Home Food',
-            style: TextStyle(color: Colors.white, fontFamily: 'LiterataBook'),
+          centerTitle: true,
+          title: Container(
+            // To align the text to the center of the appbar
+
+            child: Text(
+              // Text with Home Food and white colored font
+              'Home Food',
+              style: TextStyle(color: Colors.white, fontFamily: 'LiterataBook'),
+            ),
           ),
-        ),
-        backgroundColor: Colors.teal
-      ),
+          backgroundColor: Colors.teal),
 
       // Body section starts here
       // ListView to enable scrolling horizontally
       body: ListView(
         children: <Widget>[
           // Container with fixed height for profile picture and name
-          new Container(
-            height: 130.0,
+
+          SizedBox(height: 50.0,),
+          Container(
+            height: 200,
             // Column layout for picture and name
             child: Column(
               children: <Widget>[
@@ -42,16 +45,17 @@ class MySellerProfile extends StatelessWidget {
                   ), */
                   padding: const EdgeInsets.all(10.0),
                   child: CircleAvatar(
-                backgroundImage: NetworkImage(
                     
-                    imageUrl,
+                    
+                    backgroundImage: NetworkImage(
+                      imageUrl,
                     ),
-                radius: 40,
-                backgroundColor: Colors.transparent,
-              ),
+                    radius: 60,
+                    backgroundColor: Colors.transparent,
+                  ),
                 ),
                 Text(
-                  userName,
+                  userName, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
               ],
             ),
@@ -59,15 +63,31 @@ class MySellerProfile extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(15.0),
             child: Container(
-              height: 430.0,
-              color: Color(0xff009688),
+              decoration: BoxDecoration(
+                color: Colors.teal,
+                borderRadius: BorderRadius.all(
+                  Radius.circular(15)
+                )
+              ),
+              height: 300.0,
               child: Column(
                 children: <Widget>[
                   Padding(
                     padding: EdgeInsets.all(15.0),
-                    child: Container(
-                      height: 200.0,
-                      color: Colors.white,
+                    child: StreamBuilder(
+                      stream: Firestore.instance.collection('users').document(userID).snapshots(),
+                      builder: (context, snapshot) {
+                        return Container(
+                          
+                          color: Colors.teal,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: <Widget>[
+                              Text('Location : ' + snapshot.data['location'],style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),)
+                            ],
+                          ),
+                        );
+                      }
                     ),
                   ),
                   FlatButton(
@@ -89,8 +109,10 @@ class MySellerProfile extends StatelessWidget {
                   ),
                   FlatButton(
                     onPressed: () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => MyListings()));
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => MyListings()));
                     },
                     child: Row(
                       children: <Widget>[
@@ -120,7 +142,12 @@ class MySellerProfile extends StatelessWidget {
                     ),
                   ),
                   FlatButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => EditLocation()),
+                      );
+                    },
                     child: Row(
                       children: <Widget>[
                         Text(

@@ -3,9 +3,6 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rxdart/rxdart.dart';
 
-
-
-
 String userName;
 String imageUrl;
 String userID;
@@ -18,7 +15,6 @@ class AuthService {
   Observable<FirebaseUser> user;
   Observable<Map<String, dynamic>> profile;
   PublishSubject loading = PublishSubject();
-  
 
   AuthService() {
     user = Observable(_auth.onAuthStateChanged);
@@ -39,8 +35,6 @@ class AuthService {
     return _auth.currentUser();
   }
 
-
-
   Future<FirebaseUser> signInWithGoogle() async {
     loading.add(true);
     final GoogleSignInAccount googleSignInAccount = await googleSignIn.signIn();
@@ -54,17 +48,14 @@ class AuthService {
 
     final FirebaseUser user = await _auth.signInWithCredential(credential);
 
-    
-    
     userName = user.displayName;
     imageUrl = user.photoUrl;
     userID = user.uid;
 
     if (userName.contains(" ")) {
-    userName = userName.substring(0, userName.indexOf(" "));
-  }
+      userName = userName.substring(0, userName.indexOf(" "));
+    }
 
- 
     updateUserData(user);
     loading.add(false);
 
@@ -100,9 +91,10 @@ class AuthService {
       'lastseen': DateTime.now(),
     }, merge: true);
   }
+
   void signOutGoogle() async {
     await googleSignIn.signOut();
-    
+
     print("User Sign Out");
   }
 }
